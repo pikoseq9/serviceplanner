@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Apollo Server Backend for Calendar App",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "keywords": [
+    "graphql",
+    "apollo",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^5.0.0",
+    "@prisma/client": "^6.18.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "graphql": "^16.11.0",
+    "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.9.1",
+    "prisma": "^6.18.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
