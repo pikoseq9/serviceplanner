@@ -280,7 +280,7 @@ function logout() {
                 <p><b>Opis:</b> {item.opis}</p>
               {/if}
               <button class="delete-btn" on:click={() => deleteService(item.id)}>
-                🗑️ Usuń
+                Usuń
               </button>
             </div>
           {/each}
