@@ -274,6 +274,9 @@ function logout() {
             <div class="calendar-item">
               <h3>{item.name}</h3>
               <p><b>Wykonawca:</b> {item.wykonawca}</p>
+
+              <!-- TODO - FIX THE DATE FORMAT (resolver too) -->
+
               <p><b>Data:</b> {formatDate(item.data)}</p>
               <p><b>Czas:</b> {item.godzinaRozp} - {item.godzinaZak}</p>
               {#if item.opis}
