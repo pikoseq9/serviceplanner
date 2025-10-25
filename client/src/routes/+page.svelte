@@ -2,12 +2,14 @@
   import { onMount } from 'svelte';
   import '../app.scss';
 
-  // --- Typy ---
   interface CalendarItem {
     id: string;
-    title: string;
-    date: string;
-    durationMinutes: number;
+    name: string;
+    wykonawca: string;
+    data: string;
+    godzinaRozp: string;
+    godzinaZak: string;
+    opis: string;
   }
 
   interface User {
@@ -17,7 +19,6 @@
     role: string;
   }
 
-  // --- Stan aplikacji ---
   let items: CalendarItem[] = [];
   let loading = true;
   let errorMessage: string | null = null;
@@ -28,31 +29,58 @@
   let authToken: string | null = null;
   let loggedInUser: User | null = null;
 
-  let newItemTitle = '';
-  let newItemDate = new Date().toISOString().substring(0, 10);
-  let newItemDuration = 60;
+  let newName = '';
+  let newWykonawca = '';
+  let newDate = new Date().toISOString().substring(0, 10);
+  let newStart = '09:00';
+  let newEnd = '10:00';
+  let newOpis = '';
 
-  // --- GraphQL ---
   const GET_CALENDAR_ITEMS = `
     query GetCalendarItems {
       calendarItems {
         id
-        title
-        date
-        durationMinutes
+        name
+        wykonawca
+        data
+        godzinaRozp
+        godzinaZak
+        opis
       }
     }
   `;
 
   const ADD_ITEM_MUTATION = `
-    mutation AddItem($title: String!, $date: String!, $durationMinutes: Int!) {
-      addItem(title: $title, date: $date, durationMinutes: $durationMinutes) {
+    mutation AddItem(
+      $name: String!,
+      $wykonawca: String!,
+      $data: String!,
+      $godzinaRozp: String!,
+      $godzinaZak: String!,
+      $opis: String
+    ) {
+      addItem(
+        name: $name,
+        wykonawca: $wykonawca,
+        data: $data,
+        godzinaRozp: $godzinaRozp,
+        godzinaZak: $godzinaZak,
+        opis: $opis
+      ) {
         id
-        title
-        date
-        durationMinutes
+        name
+        wykonawca
+        data
+        godzinaRozp
+        godzinaZak
+        opis
       }
     }
+  `;
+    const DELETE_ITEM_MUTATION = `
+      mutation DeleteService($id: ID!) {
+    deleteService(id: $id)
+  }
   `;
 
   const LOGIN_MUTATION = `
@@ -69,7 +97,6 @@
     }
   `;
 
-  // --- GraphQL Fetch ---
   async function graphQLFetch(query: string, variables: Record<string, any> = {}) {
     const API_URL = 'http://localhost:4000/';
 
@@ -98,7 +125,6 @@
     }
   }
 
-  // --- Funkcje ---
   async function fetchItems() {
     loading = true;
     errorMessage = null;
@@ -108,114 +134,154 @@
   }
 
   async function handleSubmit() {
-    if (!newItemTitle || !newItemDate) return alert('Title and Date required');
+    if (!newName || !newDate) return alert('Nazwa i data są wymagane');
     const variables = {
-      title: newItemTitle,
-      date: newItemDate,
-      durationMinutes: parseInt(newItemDuration.toString(), 10),
+      name: newName,
+      wykonawca: newWykonawca,
+      data: newDate,
+      godzinaRozp: newStart,
+      godzinaZak: newEnd,
+      opis: newOpis
     };
     const data = await graphQLFetch(ADD_ITEM_MUTATION, variables);
     if (data?.addItem) {
-      newItemTitle = '';
-      newItemDuration = 60;
+      newName = '';
+      newWykonawca = '';
+      newOpis = '';
       await fetchItems();
     }
   }
 
+  async function deleteService(id: string) {
+  const confirmed = confirm('Are you sure you want to delete this service?');
+  if (!confirmed) return;
+
+  const data = await graphQLFetch(DELETE_ITEM_MUTATION, { id });
+
+  if (data?.deleteService) {
+    items = items.filter(item => item.id !== id);
+  }
+}
+
   async function handleLogin() {
-    if (!email || !password) return alert('Email and password required');
+    if (!email || !password) return alert('Email i hasło są wymagane');
     const variables = { email, password };
     const data = await graphQLFetch(LOGIN_MUTATION, variables);
     if (data?.login) {
       authToken = data.login.token;
       loggedInUser = data.login.user;
+      localStorage.setItem('authToken', JSON.stringify(authToken));
+      localStorage.setItem('user', JSON.stringify(loggedInUser));
       loginModal = false;
       await fetchItems();
     } else {
-      alert('Invalid credentials');
+      alert('Nieprawidłowe dane logowania');
     }
   }
 
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  onMount(() => {
-    if (!authToken) loginModal = true;
-    else fetchItems();
+  onMount(async () => {
+  const savedToken = localStorage.getItem('authToken');
+  const savedUser = localStorage.getItem('user');
+
+  if (savedToken !== null && savedUser !== null) {
+    authToken = savedToken;
+    loggedInUser = JSON.parse(savedUser);
+    loginModal = false;
+
+    console.log("Token przywrócony z localStorage:", authToken);
+    await fetchItems();
+  } else {
+    loginModal = true;
+  }
   });
+function logout() {
+  authToken = null;
+  loggedInUser = null;
+  loginModal = true;
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+}
 </script>
 
-<svelte:head>
-  <title>Calendar Planner</title>
-</svelte:head>
-
-<!-- LOGIN MODAL -->
 {#if loginModal}
   <div class="login-modal">
     <div class="login-card">
-      <h2>Login</h2>
+      <h2>Logowanie</h2>
       <input type="email" placeholder="Email" bind:value={email} />
-      <input type="password" placeholder="Password" bind:value={password} />
-      <button on:click={handleLogin}>Log In</button>
+      <input type="password" placeholder="Hasło" bind:value={password} />
+      <button on:click={handleLogin}>Zaloguj</button>
     </div>
   </div>
 {/if}
 
 <div class="app-container">
   <div class="main-content">
-    <h1 class="page-title">🗓️ Full-Stack Calendar Planner</h1>
-
     {#if !loginModal}
-      <!-- FORM -->
+      <button class="logout-btn" on:click={logout}>Log out</button>
+    {/if}
+    <h1 class="page-title">Service Planner</h1>
+    {#if !loginModal}
       <div class="form-card">
-        <h2 class="form-title">Add New Calendar Item</h2>
+        <h2 class="form-title">Dodaj nową usługę</h2>
         <form on:submit|preventDefault={handleSubmit} class="form-grid">
-          <label class="form-label-container">
-            <span class="form-label">Title</span>
-            <input type="text" bind:value={newItemTitle} required class="form-input" />
+          <label>
+            <span>Nazwa</span>
+            <input type="text" bind:value={newName} required />
           </label>
-
-          <label class="form-label-container">
-            <span class="form-label">Date</span>
-            <input type="date" bind:value={newItemDate} required class="form-input" />
+          <label>
+            <span>Wykonawca</span>
+            <input type="text" bind:value={newWykonawca} />
           </label>
-
-          <label class="form-label-container">
-            <span class="form-label">Duration (min)</span>
-            <input type="number" bind:value={newItemDuration} min="1" max="480" class="form-input" />
+          <label>
+            <span>Data</span>
+            <input type="date" bind:value={newDate} required />
           </label>
-
-          <button type="submit" disabled={loading} class="submit-button">
-            {loading ? 'Adding...' : 'Add Item'}
-          </button>
+          <label>
+            <span>Godzina rozpoczęcia</span>
+            <input type="time" bind:value={newStart} />
+          </label>
+          <label>
+            <span>Godzina zakończenia</span>
+            <input type="time" bind:value={newEnd} />
+          </label>
+          <label>
+            <span>Opis</span>
+            <textarea bind:value={newOpis}></textarea>
+          </label>
+          <button type="submit" disabled={loading}>{loading ? 'Dodawanie...' : 'Dodaj usługę'}</button>
         </form>
       </div>
 
-      <!-- CALENDAR ITEMS -->
-      <h2 class="list-title">Scheduled Events</h2>
+      <h2 class="list-title">Lista usług</h2>
 
       {#if errorMessage}
         <p class="error-message">
-          Error: {errorMessage} <button on:click={fetchItems} class="reload-button">Try Reloading</button>
+          Błąd: {errorMessage}
+          <button on:click={fetchItems}>Odśwież</button>
         </p>
       {:else if loading && items.length === 0}
-        <div class="loading-state">Loading calendar items...</div>
+        <div>Wczytywanie usług...</div>
       {:else if items.length === 0}
-        <div class="empty-state">No events scheduled. Use the form above to add your first item!</div>
+        <div>Brak zaplanowanych usług.</div>
       {:else}
         <div class="item-list">
-          {#each items.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()) as item (item.id)}
+          {#each items.sort((a,b) => new Date(a.data).getTime() - new Date(b.data).getTime()) as item (item.id)}
             <div class="calendar-item">
-              <div class="item-date-box">
-                {formatDate(item.date).split(' ')[1]} {formatDate(item.date).split(' ')[2]}
-              </div>
-              <div class="item-details">
-                <h3 class="item-title">{item.title}</h3>
-                <p class="item-meta">{formatDate(item.date)} &bull; {item.durationMinutes} minutes</p>
-              </div>
-              <div class="item-id">ID: {item.id}</div>
+              <h3>{item.name}</h3>
+              <p><b>Wykonawca:</b> {item.wykonawca}</p>
+              <p><b>Data:</b> {formatDate(item.data)}</p>
+              <p><b>Czas:</b> {item.godzinaRozp} - {item.godzinaZak}</p>
+              {#if item.opis}
+                <p><b>Opis:</b> {item.opis}</p>
+              {/if}
+              <button class="delete-btn" on:click={() => deleteService(item.id)}>
+                🗑️ Usuń
+              </button>
             </div>
           {/each}
         </div>

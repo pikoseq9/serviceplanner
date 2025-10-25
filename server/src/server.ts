@@ -41,6 +41,7 @@ type Service {
   godzinaRozp: String
   godzinaZak: String
   opis: String
+  createdById: ID!
   createdBy: User!
 }
 
@@ -58,6 +59,8 @@ type Mutation {
     opis: String
   ): Service!
 
+  deleteService(id: ID!): Boolean!
+
   login(email: String!, password: String!): AuthPayload!
 }
 `;
@@ -73,19 +76,38 @@ const resolvers = {
     addItem: async (parent: any, args: any, context: Context) => {
       if (!context.user) throw new Error('Unauthorized');
 
+      const fullDateStart = new Date(`${args.data}T${args.godzinaRozp || '00:00'}`);
+      const fullDateEnd = new Date(`${args.data}T${args.godzinaZak || '00:00'}`);
+
       return prisma.service.create({
         data: {
           name: args.name,
           wykonawca: args.wykonawca || '',
-          data: new Date(args.data),
+          data: fullDateStart,
           godzinaRozp: args.godzinaRozp || '',
           godzinaZak: args.godzinaZak || '',
           opis: args.opis || '',
-          createdById: context.user.id,
+          createdBy: { connect: { id: context.user.id } },
         },
         include: { createdBy: true },
       });
     },
+
+    deleteService: async (parent: any, { id }, context: Context) => {
+      if (!context.user) throw new Error('Unauthorized');
+
+      const service = await prisma.service.findUnique({ where: { id } });
+      if (!service) throw new Error("Service not found!");
+
+      // Sprawdzenie uprawnień: tylko właściciel lub ADMIN może usuwać
+      if (service.createdById !== context.user.id && context.user.role !== UserRole.ADMIN) {
+        throw new Error('Unauthorized');
+      }
+
+      await prisma.service.delete({ where: { id } });
+      return true;
+    },
+
     login: async (parent: any, { email, password }: { email: string; password: string }) => {
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) throw new Error('Invalid credentials');
@@ -93,7 +115,11 @@ const resolvers = {
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) throw new Error('Invalid credentials');
 
-      const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '8h' });
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '8h' }
+      );
 
       return { token, user };
     },
