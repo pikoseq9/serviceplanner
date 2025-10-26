@@ -28,7 +28,7 @@ model Service {
   id           String   @id @default(uuid())
   name         String
   wykonawca    String
-  data         DateTime
+  data         String
   godzinaRozp  String
   godzinaZak   String
   opis         String

@@ -37,7 +37,7 @@ type Service {
   id: ID!
   name: String!
   wykonawca: String!
-  data: String!
+  data: String!  
   godzinaRozp: String
   godzinaZak: String
   opis: String
@@ -76,14 +76,11 @@ const resolvers = {
     addItem: async (parent: any, args: any, context: Context) => {
       if (!context.user) throw new Error('Unauthorized');
 
-      const fullDateStart = new Date(`${args.data}T${args.godzinaRozp || '00:00'}`);
-      const fullDateEnd = new Date(`${args.data}T${args.godzinaZak || '00:00'}`);
-
       return prisma.service.create({
         data: {
           name: args.name,
           wykonawca: args.wykonawca || '',
-          data: fullDateStart,
+          data: args.data,
           godzinaRozp: args.godzinaRozp || '',
           godzinaZak: args.godzinaZak || '',
           opis: args.opis || '',
