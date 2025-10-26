@@ -90,10 +90,10 @@ const resolvers = {
       });
     },
 
-    deleteService: async (parent: any, { id }, context: Context) => {
+    deleteService: async (parent: any, args: {id: string}, context: Context) => {
       if (!context.user) throw new Error('Unauthorized');
 
-      const service = await prisma.service.findUnique({ where: { id } });
+      const service = await prisma.service.findUnique({ where: { id: args.id } });
       if (!service) throw new Error("Service not found!");
 
       // Sprawdzenie uprawnień: tylko właściciel lub ADMIN może usuwać
@@ -101,7 +101,7 @@ const resolvers = {
         throw new Error('Unauthorized');
       }
 
-      await prisma.service.delete({ where: { id } });
+      await prisma.service.delete({ where: { id: args.id } });
       return true;
     },
 
