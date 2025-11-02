@@ -21,7 +21,7 @@
 
   let newName = '';
   let newWykonawca = '';
-  let newDate = new Date().toISOString().substring(0, 10);
+  let newDate = new Date().toLocaleDateString('sv-SE'); 
   let newStart = '09:00';
   let newEnd = '10:00';
   let newOpis = '';

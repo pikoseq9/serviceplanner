@@ -30,7 +30,7 @@
   }
 
   function getItemsForDay(day: Date) {
-    const isoDay = day.toISOString().substring(0, 10);
+    const isoDay = day.toLocaleDateString('sv-SE'); 
     return items.filter(item => item.data === isoDay);
   }
 
@@ -60,7 +60,7 @@
     {#each days as day}
       <div
         class="calendar-day {isToday(day) ? 'today' : ''}"
-        on:click={() => onSelectDate(day.toISOString().substring(0, 10))}
+        on:click={() => onSelectDate(day.toLocaleDateString('sv-SE'))}
       >
         <div class="day-number">{formatDay(day)}</div>
         {#each getItemsForDay(day) as item}
