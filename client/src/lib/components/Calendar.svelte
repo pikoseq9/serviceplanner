@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { CalendarItem } from '$lib/types';
+  import type { CalendarItem } from './types';
 
   export let onSelectDate: (date: string) => void;
   export let items: CalendarItem[] = [];
