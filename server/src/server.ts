@@ -62,6 +62,7 @@ type Mutation {
   deleteService(id: ID!): Boolean!
 
   login(email: String!, password: String!): AuthPayload!
+  register(email: String!, password: String!, name: String!, role: UserRole): AuthPayload!
 }
 `;
 
@@ -111,6 +112,29 @@ const resolvers = {
 
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) throw new Error('Invalid credentials');
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '8h' }
+      );
+
+      return { token, user };
+    },
+    register: async (parent: any, { email, password, name, role }: 
+      { email: string; password: string; name: string; role?: UserRole }) => {
+      const existing = await prisma.user.findUnique({ where: { email } });
+      if (existing) throw new Error('Użytkownik o podanym emailu już istnieje.');
+
+      const hashed = await bcrypt.hash(password, 10);
+      const user = await prisma.user.create({
+        data: {
+          email,
+          password: hashed,
+          name,
+          role: role || UserRole.REALIZATOR,
+        },
+      });
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
