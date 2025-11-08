@@ -13,7 +13,7 @@ $danger-hover: #c85103;
 $section-light: #ffffff; /* Tło sekcji w trybie jasnym */
 $section-dark: #161b22; /* Tło sekcji w trybie ciemnym */
 
-$card-light: #f1f3f5; /* Tło elementów listy w trybie jasnym */
+$card-light: #ebeef0; /* Tło elementów listy w trybie jasnym */
 $card-dark: #21262d; /* Tło elementów listy w trybie ciemnym */
 
 $calendar-accent: $primary; /* Akcent kalendarza (np. dzisiaj) */
@@ -79,13 +79,11 @@ header {
   border-radius: 10px;
   padding: 20px 25px;
   margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 body.dark .form-section,
 body.dark .list-section {
   background: $card-dark;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
 .overlay {
@@ -132,21 +130,6 @@ header {
       }
     }
   }
-}
-
-.form-section,
-.list-section {
-  background: $bg-light;
-  border-radius: 10px;
-  padding: 20px 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.form-section h2,
-.list-section h2 {
-  margin-bottom: 15px;
-  font-size: 1.3rem;
 }
 
 form {

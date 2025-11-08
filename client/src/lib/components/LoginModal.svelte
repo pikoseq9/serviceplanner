@@ -9,6 +9,14 @@
   export let setPassword: (val: string) => void;
   export let setName: (val: string) => void;
   export let toggleMode: () => void;
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isRegistering) handleRegister();
+      else handleLogin();
+    }
+  }
 </script>
 
 <div class="overlay">
@@ -36,12 +44,15 @@
       placeholder="Hasło"
       bind:value={password}
       on:input={(e) => setPassword(e.currentTarget.value)}
+      on:keydown={handleKeyDown}
     />
 
     <button on:click={isRegistering ? handleRegister : handleLogin}>
       {isRegistering ? 'Zarejestruj' : 'Zaloguj'}
     </button>
 
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <p class="switch-mode" on:click={toggleMode}>
       {isRegistering ? 'Masz już konto? Zaloguj się' : 'Nie masz konta? Zarejestruj się'}
     </p>
