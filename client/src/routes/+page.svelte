@@ -16,6 +16,8 @@
   let password = '';
   let authToken: string | null = null;
   let loggedInUser: User | null = null;
+  let isRegistering = false;
+  let name = '';
 
   let darkMode = false;
 
@@ -90,6 +92,20 @@
     }
   `;
 
+  const REGISTER_MUTATION = `
+  mutation Register($email: String!, $password: String!, $name: String!) {
+    register(email: $email, password: $password, name: $name) {
+      token
+      user {
+        id
+        email
+        name
+        role
+      }
+    }
+  }
+`;
+
   async function graphQLFetch(query: string, variables: Record<string, any> = {}) {
     try {
       const response = await fetch(API_URL, {
@@ -109,6 +125,26 @@
       errorMessage = (error as Error).message || 'Błąd komunikacji z serwerem.';
       return null;
     }
+  }
+
+  async function handleRegister() {
+    if (!email || !password || !name) return alert('Wszystkie pola są wymagane.');
+    const data = await graphQLFetch(REGISTER_MUTATION, { email, password, name });
+    if (data?.register) {
+      authToken = data.register.token;
+      loggedInUser = data.register.user;
+      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('user', JSON.stringify(loggedInUser));
+      loginModal = false;
+      await fetchItems();
+    } else {
+      alert('Nie udało się zarejestrować.');
+    }
+  }
+
+  function toggleMode() {
+    isRegistering = !isRegistering;
+    email = password = name = '';
   }
 
   async function fetchItems() {
@@ -194,9 +230,14 @@
   <LoginModal
     {email}
     {password}
+    {name}
+    {isRegistering}
     {handleLogin}
+    {handleRegister}
     setEmail={(v) => email = v}
     setPassword={(v) => password = v}
+    setName={(v) => name = v}
+    toggleMode={toggleMode}
   />
 {:else}
   <div class="container">
