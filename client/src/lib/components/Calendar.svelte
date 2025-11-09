@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { CalendarItem } from './types';
+  import { goto } from '$app/navigation';
 
   export let onSelectDate: (date: string) => void;
   export let items: CalendarItem[] = [];
@@ -44,6 +45,11 @@
     generateCalendar(currentDate);
   }
 
+  function openDayDetails(day: Date) {
+    const dateIso = day.toLocaleDateString('sv-SE');
+    goto(`/day/${dateIso}`);
+  }
+
   onMount(() => generateCalendar(currentDate));
 </script>
 
@@ -60,7 +66,7 @@
     {#each days as day}
       <div
         class="calendar-day {isToday(day) ? 'today' : ''}"
-        on:click={() => onSelectDate(day.toLocaleDateString('sv-SE'))}
+        on:click={() => openDayDetails(day)}
       >
         <div class="day-number">{formatDay(day)}</div>
         {#each getItemsForDay(day) as item}
