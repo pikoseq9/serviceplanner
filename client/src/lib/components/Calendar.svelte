@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { CalendarItem } from './types';
+  import { goto } from '$app/navigation';
 
   export let onSelectDate: (date: string) => void;
   export let items: CalendarItem[] = [];
@@ -79,7 +80,3 @@
     {/each}
   </div>
 </div>
-
-<style lang="scss">
-
-</style>

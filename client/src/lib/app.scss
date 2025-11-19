@@ -13,7 +13,7 @@ $danger-hover: #c85103;
 $section-light: #ffffff; /* Tło sekcji w trybie jasnym */
 $section-dark: #161b22; /* Tło sekcji w trybie ciemnym */
 
-$card-light: #f1f3f5; /* Tło elementów listy w trybie jasnym */
+$card-light: #ebeef0; /* Tło elementów listy w trybie jasnym */
 $card-dark: #21262d; /* Tło elementów listy w trybie ciemnym */
 
 $calendar-accent: $primary; /* Akcent kalendarza (np. dzisiaj) */
@@ -79,13 +79,11 @@ header {
   border-radius: 10px;
   padding: 20px 25px;
   margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 body.dark .form-section,
 body.dark .list-section {
   background: $card-dark;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
 .overlay {
@@ -132,21 +130,6 @@ header {
       }
     }
   }
-}
-
-.form-section,
-.list-section {
-  background: $bg-light;
-  border-radius: 10px;
-  padding: 20px 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.form-section h2,
-.list-section h2 {
-  margin-bottom: 15px;
-  font-size: 1.3rem;
 }
 
 form {
@@ -255,6 +238,12 @@ form {
   }
 }
 
+.switch-mode {
+  color: #0077cc;
+  text-align: center;
+  cursor: pointer;
+}
+
 .calendar-container {
   display: flex;
   flex-direction: column;
@@ -286,7 +275,7 @@ form {
 }
 
 .calendar-day {
-  background: $section-light;
+  background: $bg-light;
   border-radius: 8px;
   padding: 0.5rem;
   min-height: 100px;
@@ -295,7 +284,7 @@ form {
   transition: background 0.2s ease;
 
   &:hover {
-    background: #999;
+    background: #a0a0a0;
   }
 
   &.today {
@@ -318,66 +307,65 @@ form {
   }
 }
 
-
 body.dark .calendar-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background: $card-dark;
-  padding: 1rem;
-  border-radius: 12px;
-  color: $text-dark;
-}
-
-body.dark .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  button {
-    background: none;
-    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: $card-dark;
+    padding: 1rem;
+    border-radius: 12px;
     color: $text-dark;
-    font-size: 1.5rem;
+    .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+      background: none;
+      border: none;
+      color: $text-dark;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+  }
+
+  .calendar-day {
+    background: $bg-dark;
+    border-radius: 8px;
+    padding: 0.5rem;
+    min-height: 100px;
+    position: relative;
     cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #444;
+    }
+
+    &.today {
+      border: 1px solid $primary;
+    }
+
+    .day-number {
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    .calendar-event {
+      background: $primary;
+      color: $text-dark;
+      border-radius: 4px;
+      padding: 0.2rem 0.3rem;
+      font-size: 0.75rem;
+      margin-bottom: 0.2rem;
+    }
   }
 }
 
-body.dark .calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-}
-
-body.dark .calendar-day {
-  background: $section-dark;
-  border-radius: 8px;
-  padding: 0.5rem;
-  min-height: 100px;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: #444;
-  }
-
-  &.today {
-    border: 1px solid $primary;
-  }
-
-  .day-number {
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-  }
-
-  .calendar-event {
-    background: $primary;
-    color: $text-dark;
-    border-radius: 4px;
-    padding: 0.2rem 0.3rem;
-    font-size: 0.75rem;
-    margin-bottom: 0.2rem;
-  }
-}
