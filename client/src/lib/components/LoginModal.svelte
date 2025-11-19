@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Page from "../../routes/auth/+page.svelte";
+
   export let email: string;
   export let password: string;
   export let name: string;
@@ -8,7 +10,8 @@
   export let setEmail: (val: string) => void;
   export let setPassword: (val: string) => void;
   export let setName: (val: string) => void;
-  export let toggleMode: () => void;
+
+  isRegistering = false;
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter') {
@@ -16,6 +19,10 @@
       if (isRegistering) handleRegister();
       else handleLogin();
     }
+  }
+
+  const toggleMode = () => {
+    isRegistering = !isRegistering;
   }
 </script>
 
@@ -29,36 +36,19 @@
         placeholder="Imię i nazwisko"
         bind:value={name}
         oninput={(e) => setName(e.currentTarget.value)}
+        onkeydown={handleKeyDown}
       />
     {/if}
 
-    <input
-      type="email"
-      placeholder="Email"
-      bind:value={email}
-      oninput={(e) => setEmail(e.currentTarget.value)}
-    />
-
-    <input
-      type="password"
-      placeholder="Hasło"
-      bind:value={password}
-      oninput={(e) => setPassword(e.currentTarget.value)}
-      onkeydown={handleKeyDown}
-    />
-
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <input type="email" placeholder="Email" bind:value={email} />
+    <input type="password" placeholder="Hasło" bind:value={password} />
     <button onclick={isRegistering ? handleRegister : handleLogin}>
       {isRegistering ? 'Zarejestruj' : 'Zaloguj'}
     </button>
-
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <p class="switch-mode" onclick={toggleMode}>
+        <p class="switch-mode" onclick={toggleMode}>
       {isRegistering ? 'Masz już konto? Zaloguj się' : 'Nie masz konta? Zarejestruj się'}
     </p>
-    <h2>Logowanie</h2>
-    <input type="email" placeholder="Email" bind:value={email} />
-    <input type="password" placeholder="Hasło" bind:value={password} />
-    <button onclick={handleLogin}>Zaloguj</button>
   </div>
 </div>
