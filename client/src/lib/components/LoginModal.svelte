@@ -28,7 +28,7 @@
         type="text"
         placeholder="Imię i nazwisko"
         bind:value={name}
-        on:input={(e) => setName(e.currentTarget.value)}
+        oninput={(e) => setName(e.currentTarget.value)}
       />
     {/if}
 
@@ -36,24 +36,24 @@
       type="email"
       placeholder="Email"
       bind:value={email}
-      on:input={(e) => setEmail(e.currentTarget.value)}
+      oninput={(e) => setEmail(e.currentTarget.value)}
     />
 
     <input
       type="password"
       placeholder="Hasło"
       bind:value={password}
-      on:input={(e) => setPassword(e.currentTarget.value)}
-      on:keydown={handleKeyDown}
+      oninput={(e) => setPassword(e.currentTarget.value)}
+      onkeydown={handleKeyDown}
     />
 
-    <button on:click={isRegistering ? handleRegister : handleLogin}>
+    <button onclick={isRegistering ? handleRegister : handleLogin}>
       {isRegistering ? 'Zarejestruj' : 'Zaloguj'}
     </button>
 
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <p class="switch-mode" on:click={toggleMode}>
+    <p class="switch-mode" onclick={toggleMode}>
       {isRegistering ? 'Masz już konto? Zaloguj się' : 'Nie masz konta? Zarejestruj się'}
     </p>
     <h2>Logowanie</h2>
