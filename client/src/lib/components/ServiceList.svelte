@@ -22,7 +22,7 @@
         <div class="item-card">
           <div class="item-header">
             <h3>{item.name}</h3>
-            <button class="delete" on:click={() => deleteService(item.id)}>✕</button>
+            <button class="delete" onclick={() => deleteService(item.id)}>✕</button>
           </div>
           <p><b>Wykonawca:</b> {item.wykonawca || '—'}</p>
           <p><b>Data:</b> {formatDate(item.data)}</p>

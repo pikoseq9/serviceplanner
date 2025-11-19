@@ -29,9 +29,13 @@
     return d.toDateString() === now.toDateString();
   }
 
+  function toIso(d: Date) {
+  return d.toISOString().split("T")[0];
+  }
+
   function getItemsForDay(day: Date) {
-    const isoDay = day.toLocaleDateString('sv-SE'); 
-    return items.filter(item => item.data === isoDay);
+  const isoDay = toIso(day);
+  return items.filter(item => item.data === isoDay);
   }
 
   function prevMonth() {
@@ -44,23 +48,25 @@
     generateCalendar(currentDate);
   }
 
-  onMount(() => generateCalendar(currentDate));
+  $: if (items.length > 0) {
+  generateCalendar(currentDate);
+  }
 </script>
 
 <div class="calendar-container">
   <div class="calendar-header">
-    <button on:click={prevMonth}>‹</button>
+    <button onclick={prevMonth}>‹</button>
     <h2>
       {currentDate.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })}
     </h2>
-    <button on:click={nextMonth}>›</button>
+    <button onclick={nextMonth}>›</button>
   </div>
 
   <div class="calendar-grid">
     {#each days as day}
       <div
         class="calendar-day {isToday(day) ? 'today' : ''}"
-        on:click={() => onSelectDate(day.toLocaleDateString('sv-SE'))}
+        onclick={() => onSelectDate(day.toLocaleDateString('sv-SE'))}
       >
         <div class="day-number">{formatDay(day)}</div>
         {#each getItemsForDay(day) as item}
